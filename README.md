@@ -62,8 +62,9 @@ mlops_project/
 │   ├── start_mlflow_ui.sh           # SQLite-backed tracking server, port 5000
 │   └── start_mlflow_serve.sh        # MLflow built-in scoring server, port 5001
 ├── reports/
-│   ├── project_report.md            # written deliverable
-│   ├── presentation_outline.md      # presentation slide-by-slide
+│   ├── project_report.pdf           # written deliverable (PDF)
+│   ├── project_report.docx          # same content as DOCX
+│   ├── presentation.pptx            # presentation deliverable
 │   └── drift_report_*.html          # Evidently reports (one per scenario)
 ├── artifacts/                       # confusion matrices, ROC curves
 └── requirements.txt
