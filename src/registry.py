@@ -60,7 +60,10 @@ def register_best(model_name: str = REGISTERED_MODEL_NAME) -> dict:
         raise RuntimeError(f"Experiment {EXPERIMENT_NAME!r} not found — train models first.")
 
     best_run = _best_run_across_experiment(client, exp.experiment_id)
-    best_score = best_run.data.metrics.get("test_roc_auc") or best_run.data.metrics["best_test_roc_auc"]
+    best_score = (
+        best_run.data.metrics.get("test_roc_auc")
+        or best_run.data.metrics["best_test_roc_auc"]
+    )
 
     # MLflow 3 stores models as "Logged Models" with model_id="m-<uuid>"; locate the
     # one produced by this run and register against its canonical URI.
@@ -89,10 +92,16 @@ def register_best(model_name: str = REGISTERED_MODEL_NAME) -> dict:
     client.set_model_version_tag(model_name, mv.version, "selection_metric", f"{best_score:.6f}")
 
     print(
-        f"Registered {model_name} v{mv.version} from run {best_run.info.run_id} "
+        f"Registered {model_name} v{mv.version} from "
+        f"run {best_run.info.run_id} "
         f"(family={family}, test_roc_auc={best_score:.4f})"
     )
-    return {"name": model_name, "version": mv.version, "run_id": best_run.info.run_id, "score": best_score}
+    return {
+        "name": model_name,
+        "version": mv.version,
+        "run_id": best_run.info.run_id,
+        "score": best_score,
+    }
 
 
 def transition(model_name: str, version: str | int, stage: str) -> None:

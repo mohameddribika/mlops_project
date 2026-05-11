@@ -29,7 +29,9 @@ class ClassificationMetrics:
         return {f"{prefix}{k}": v for k, v in asdict(self).items()}
 
 
-def compute_metrics(y_true: np.ndarray, y_pred: np.ndarray, y_proba: np.ndarray) -> ClassificationMetrics:
+def compute_metrics(
+    y_true: np.ndarray, y_pred: np.ndarray, y_proba: np.ndarray
+) -> ClassificationMetrics:
     return ClassificationMetrics(
         accuracy=accuracy_score(y_true, y_pred),
         precision=precision_score(y_true, y_pred, zero_division=0),

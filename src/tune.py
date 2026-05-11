@@ -54,7 +54,9 @@ def _build_estimator(model_name: str, params: dict[str, Any]):
             random_state=RANDOM_STATE,
         )
     if model_name == "logreg":
-        penalty = params["penalty"] if isinstance(params["penalty"], str) else ["l1", "l2"][params["penalty"]]
+        penalty = params["penalty"]
+        if not isinstance(penalty, str):
+            penalty = ["l1", "l2"][penalty]
         solver = "liblinear" if penalty == "l1" else "lbfgs"
         return LogisticRegression(
             C=float(params["C"]),

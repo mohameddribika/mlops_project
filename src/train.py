@@ -135,7 +135,10 @@ def train_one(
         test_metrics = compute_metrics(
             np.asarray(y_test), test_pred, test_proba
         ).as_dict(prefix="test_")
-        print(f"[{model_name}] run_id={run.info.run_id}  test_roc_auc={test_metrics['test_roc_auc']:.4f}")
+        print(
+            f"[{model_name}] run_id={run.info.run_id}  "
+            f"test_roc_auc={test_metrics['test_roc_auc']:.4f}"
+        )
         return {"run_id": run.info.run_id, **test_metrics}
 
 

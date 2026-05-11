@@ -31,10 +31,12 @@ python3.12 -m venv .venv
 .venv/bin/python -m src.registry transition 1 production
 .venv/bin/python -m src.registry list
 
-# 5. serve
-./scripts/start_api.sh                       # http://127.0.0.1:8000
-# alternative — MLflow built-in serving:
-# .venv/bin/mlflow models serve -m "models:/telco-churn-classifier@production" --no-conda
+# 5. serve — pick one
+./scripts/start_mlflow_serve.sh              # MLflow built-in scoring server (port 5001)
+                                             #   POST /invocations expects:
+                                             #   {"dataframe_split": {"columns": [...], "data": [...]}}
+./scripts/start_api.sh                       # FastAPI alternative (port 8000)
+                                             #   POST /predict expects a typed JSON record
 
 # 6. drift monitoring (3 simulated batches: clean / feature_drift / concept_drift)
 .venv/bin/python -m src.monitor
@@ -63,6 +65,7 @@ mlops_project/
 │   └── monitor.py                   # drift + perf monitoring runs
 ├── scripts/
 │   ├── start_mlflow_ui.sh           # SQLite-backed tracking server, port 5000
+│   ├── start_mlflow_serve.sh        # MLflow built-in scoring server, port 5001
 │   └── start_api.sh                 # uvicorn FastAPI server, port 8000
 ├── reports/
 │   ├── project_report.md            # written deliverable

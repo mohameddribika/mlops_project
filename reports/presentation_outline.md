@@ -57,12 +57,18 @@ Backend store = SQLite; artifact root = local FS.
 
 ## Slide 7 — Deployment (4:00 – 5:00)
 
-- FastAPI service, single startup hook:
-  `mlflow.sklearn.load_model("models:/telco-churn-classifier@production")`.
-- Pydantic schema validation → 422 on bad payloads.
-- Endpoints: `/health`, `/predict`, `/predict-batch`.
-- Live demo: `curl` a Month-to-month / tenure=1 / electronic-check record →
-  returns `churn_prediction=1, prob=0.68`. Classic high-churn profile flagged.
+Two serving paths to cover both "MLflow's model serving capabilities"
+(the brief's wording) and a real-world pattern:
+
+1. **`mlflow models serve`** on port 5001 — POST `/invocations` with the
+   standard `dataframe_split` payload. Zero serving code, model
+   reconstructed from the registry artifact.
+2. **FastAPI** (`src/serve.py`) on port 8000 — typed Pydantic schemas, 422
+   on bad payloads, returns probability + version + URI for traceability.
+
+Live demo: `curl` a Month-to-month / tenure=1 / electronic-check record
+to FastAPI → `churn_prediction=1, prob=0.68`. ✂ MLflow scoring server
+demo if tight.
 
 ## Slide 8 — Drift monitoring (5:00 – 6:30)
 

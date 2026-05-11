@@ -147,8 +147,36 @@ After running these commands the registered model has one version:
 
 ### 4.4 Deployment (Objective 3)
 
-`src/serve.py` is a FastAPI app whose lifespan handler loads
-`models:/telco-churn-classifier@production` once on startup. It exposes:
+The brief calls out "MLflow's model serving capabilities" specifically, so
+the production model is exposed via **two** deployment paths to demonstrate
+both: MLflow's built-in scoring server and a custom FastAPI service.
+
+**Path A — MLflow built-in scoring server** (`scripts/start_mlflow_serve.sh`):
+
+```bash
+mlflow models serve \
+    --model-uri "models:/telco-churn-classifier@production" \
+    --port 5001 --no-conda
+```
+
+Exposes the standard MLflow inference contract:
+
+| Endpoint | Use case |
+| --- | --- |
+| `GET  /ping` | health check |
+| `POST /invocations` | accepts `{"dataframe_split": {"columns": [...], "data": [...]}}` |
+
+Verified end-to-end: a 3-row batch from the test split returns
+`{"predictions": [0, 1, 0]}`. This path requires zero serving code — MLflow
+reconstructs the sklearn `Pipeline` from the logged artifact and routes
+requests through it.
+
+**Path B — Custom FastAPI service** (`src/serve.py`, `scripts/start_api.sh`):
+
+A FastAPI app whose lifespan handler loads
+`models:/telco-churn-classifier@production` once on startup. It adds
+typed request validation and a probability output for downstream
+decisioning systems.
 
 | Endpoint | Use case |
 | --- | --- |
@@ -166,6 +194,11 @@ via Pydantic — bad payloads are rejected with HTTP 422 before reaching the mod
 ```
 
 The classic high-churn profile is correctly flagged.
+
+**When to use which:** `mlflow models serve` is right for quick deployment and
+A/B comparisons where the standard MLflow inference contract is sufficient.
+The FastAPI layer is right when you need typed schemas, custom auth, business
+logic, or probability outputs for ranking and threshold tuning.
 
 ### 4.5 Drift monitoring (Objective 4)
 
